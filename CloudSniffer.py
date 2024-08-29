@@ -88,13 +88,21 @@ def check_url(ip, url):
             print(Fore.YELLOW + f'IP {ip} caused a redirect, might be real.')
             if trace:
                 trace_file.write(f'IP {ip} caused a redirect, might be real.\n')
+    except requests.exceptions.ConnectTimeout:
+        if trace:
+            trace_file.write(f'Request for IP {ip} failed with timeout error.\n')
+    except requests.exceptions.HTTPError as errh:
+        if trace:
+            trace_file.write(f'Http Error: {str(errh)} for IP {ip}\n')
+    except requests.exceptions.ConnectionError as errc:
+        if trace:
+            trace_file.write(f'Error Connecting: {str(errc)} for IP {ip}\n')
+    except requests.exceptions.Timeout as errt:
+        if trace:
+            trace_file.write(f'Timeout Error: {str(errt)} for IP {ip}\n')
     except requests.exceptions.RequestException as err:
-        if isinstance(err, requests.exceptions.ConnectTimeout):
-            if trace:
-                trace_file.write(f'Request for IP {ip} failed with timeout error: {err}\n')
-        else:
-            if trace:
-                trace_file.write(f'Request for IP {ip} failed with error: {err}\n')
+        if trace:
+            trace_file.write(f'Request Error: {str(err)} for IP {ip}\n')
 
 for ip in tqdm(ip_addresses, ncols=75, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt}'):
     ip = ip.strip()
